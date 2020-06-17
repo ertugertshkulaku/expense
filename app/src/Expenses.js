@@ -12,11 +12,12 @@ class Expenses extends Component {
 
     emptyItem = {
         
-        expensedate : new Date(),
+        
         description : '',
+        expensedate : new Date(),
         id: 104,
         location : '',
-        categories : [1, 'Travel']
+        category : {id :1, name: 'Travel'}
 
     }
 
@@ -32,7 +33,57 @@ class Expenses extends Component {
             item : this.emptyItem
 
         }
+
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.handleDateChange = this.handleDateChange.bind(this);
     }
+
+
+    async handleSubmit(event){
+        const item = this.state.item;
+        
+        await fetch(`/api/expenses`, {
+            method : 'POST',
+            headers : {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body : JSON.stringify(item),
+          });
+
+
+      
+
+    event.peventDefault();
+        this.props.history.push("/expenses");
+         }
+
+
+    handleChange(event){
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+        let item = {...this.state.item};
+        item[name] = value;
+        this.setState({item});
+        console.log(item);
+    }
+
+
+    handleDateChange(date){
+        let item = {...this.state.item};
+        item.expensedate = date;
+        this.setState({item});
+        console.log(item);
+    }
+
+
+
+
+
+
+
 
 
     async remove(id){
@@ -73,12 +124,12 @@ class Expenses extends Component {
         if(isLoading)
         return(<div>Loading..../</div>)
 
-       let optionList =
-            Categories.map(category =>
-            <option id ={category.id}>
-                {category.name}
-                 </option>
-            )
+        let optionList  =
+        Categories.map( (category) =>
+            <option value={category.id} key={category.id}>
+                        {category.name} 
+            </option>
+        )
 
             let rows=
             Expenses.map( expense =>
@@ -101,32 +152,37 @@ class Expenses extends Component {
                 {title}
                 <Form onSubmit={this.handleSubmit}>
                     <FormGroup>
-                        <Label for="title">Title</Label>
-                        <Input type="text" name="title" id="title" onChange={this.handleChange} autoComplete="name"/>
+                        <Label for="description">Title</Label>
+                        <Input type="description" name="description" id="description" 
+                            onChange={this.handleChange} autoComplete="name"/>
+                    
                     </FormGroup>
+
                     <FormGroup>
-                        <Label for="category">Category</Label>
-                        <select>
-                        {optionList}
+                        <Label for="category" >Category</Label>
+                        <select onChange={this.handleChange}>
+                                {optionList}
                         </select>
-                        
+                    
                     </FormGroup>
+
                     <FormGroup>
-                        <Label for="city"> Date</Label>
-                        < DatePicker selected={this.state.date} onChange={this.handleChange}/>
+                        <Label for="city">Date</Label>
+                        <DatePicker    selected={this.state.item.expensedate}  onChange={this.handleDateChange} />
                     </FormGroup>
+
                     <div className="row">
-                    <FormGroup className="col-md-4 mb-3">
+                        <FormGroup className="col-md-4 mb-3">
                         <Label for="location">Location</Label>
                         <Input type="text" name="location" id="location" onChange={this.handleChange}/>
-                    </FormGroup>
+                        </FormGroup>
+                      
                     </div>
                     <FormGroup>
-                        <Button color="primary" type="submit" >Save</Button>
-                        <Button color="secondary" tag={Link} to="/" >Cancel</Button>
+                        <Button color="primary" type="submit">Save</Button>{' '}
+                        <Button color="secondary" tag={Link} to="/">Cancel</Button>
                     </FormGroup>
-                </Form>
-
+                    </Form>
 
 
 
